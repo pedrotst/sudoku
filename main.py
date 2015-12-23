@@ -1,14 +1,6 @@
 from board import Board
 
-def check_row(board):
 
-	print(board.get_row(2))
-
-def check_col(board):
-	print(board.get_col(1))
-
-def check_block(board):
-	print(board.get_block(8))
 
 if __name__ == '__main__':
 	board = Board()
@@ -41,9 +33,21 @@ if __name__ == '__main__':
 	board.set_element('4', 8, 2)
 	board.set_element('3', 8, 5)
 	print(board)
+
 	flag = True
 
-	while(flag):
-		flag = check_board
-	check_block(board)
+	# for row_num, row in enumerate(board.get_board()):
+	# 	for col_num, ele in enumerate(row):
+	# 		if(not ele.is_set()):
+	# 			check_element(ele, row_num, col_num)
+	# print(board.get_board()[0][0].get_possible_list())
+	board.validate_element(0, 0)
 
+def check_row(board, row):
+	print(board.get_row(row))
+
+def check_col(board, col):
+	print(board.get_col(col))
+
+def check_block(board, block):
+	print(board.get_block(block))

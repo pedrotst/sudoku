@@ -1,7 +1,9 @@
+from square import Square, Square_Values
+
 class Board(object):
 
 	def __init__(self):
-		self.board = [['_' for _ in range(9)] for _ in range(9)]
+		self.board = [[Square() for _ in range(9)] for _ in range(9)]
 
 	def __str__(self):
 		string = ''
@@ -11,7 +13,7 @@ class Board(object):
 			for col_num, ele in enumerate(row):
 				if(col_num % 3 == 0):
 					string += '| '
-				string += ele + ' '
+				string += str(ele) + ' '
 			string += '|\n'
 
 		string += '=========================\n'
@@ -20,8 +22,11 @@ class Board(object):
 	def __repr__(self):
 		return self.__str__()
 
+	def get_board(self):
+		return self.board
+
 	def set_element(self, elem, row, col):
-		self.board[row][col] = elem
+		self.board[row][col].set_possibility(elem, Square_Values.true)
 
 	def get_row(self, row):
 		return self.board[row]
@@ -60,3 +65,38 @@ class Board(object):
 				block_list += not_merged
 
 		return block_list
+
+	def calc_block(self, row, col):
+		if 0 <= row < 3:
+			if 0 <= col < 3:
+				return 0
+			elif 3 <= col < 6:
+				return 1
+			elif 6 <= col < 9:
+				return 2
+		elif 3 <= row < 6:
+			if 0 <= col < 3:
+				return 3
+			elif 3 <= col < 6:
+				return 4
+			elif 6 <= col < 9:
+				return 5
+		elif 6 <= row < 9:
+			if 0 <= col < 3:
+				return 6
+			elif 3 <= col < 6:
+				return 7
+			elif 6 <= col < 9:
+				return 8
+
+	def delete_spaces(self, _list):
+		return [x for x in _list if str(x) != '_']
+
+	def validate_element(self, row, col):
+		row_list = self.get_row(row)
+		print(self.delete_spaces(row_list))
+		col_list = self.get_col(col)
+		print(self.delete_spaces(col_list))
+		block_list = self.get_block(self.calc_block(row,col))
+		print(self.delete_spaces(block_list))
+		print(self.board[row][col].get_possible_list())
