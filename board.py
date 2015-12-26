@@ -3,7 +3,7 @@ from square import Square, Square_Values
 class Board(object):
 
 	def __init__(self):
-		self.board = [[Square() for _ in range(9)] for _ in range(9)]
+		self.board = [[Square(row, col) for col in range(9)] for row in range(9)]
 
 	def __str__(self):
 		string = ''
@@ -28,13 +28,14 @@ class Board(object):
 	def set_element(self, elem, row, col):
 		self.board[row][col].set_possibility(elem, Square_Values.true)
 
-	def get_row(self, row):
+	def get_row(self, row, col):
 		return self.board[row]
 
-	def get_col(self, col):
+	def get_col(self, row, col):
 		return [x[col] for x in self.board]
 
-	def get_block(self, block):
+	def get_block(self, row, col):
+		block = self.calc_block(row, col)
 		block_list = []
 		if(block == 0):
 			for not_merged in [x[:3] for x in self.board[:3]]:
@@ -90,13 +91,63 @@ class Board(object):
 				return 8
 
 	def delete_spaces(self, _list):
-		return [x for x in _list if str(x) != '_']
+		return [x for x in _list if repr(x) != '_']
+
+	def impossible_list(self, row, col):
+		row_list = self.get_row(row, 0)
+		col_list = self.get_col(0, col)
+		block_list = self.get_block(row,col)
+		impossible_list = self.delete_spaces(row_list) + self.delete_spaces(col_list) + self.delete_spaces(block_list)
+		impossible_list = [x for x in self.board[row][col].get_possible_list() if x in [repr(i) for i in impossible_list]]
+		return impossible_list
 
 	def validate_element(self, row, col):
-		row_list = self.get_row(row)
-		print(self.delete_spaces(row_list))
-		col_list = self.get_col(col)
-		print(self.delete_spaces(col_list))
-		block_list = self.get_block(self.calc_block(row,col))
-		print(self.delete_spaces(block_list))
-		print(self.board[row][col].get_possible_list())
+		impossible_list = self.impossible_list(row,col)
+		# print("row: {}, col: {}, imp_list: {}".format(row, col, impossible_list))
+		for impossible_ele in impossible_list:
+			self.board[row][col].set_possibility(impossible_ele, Square_Values.false)
+	
+	def check_only_possible(self, checking_fun, row, col):
+		# check_group = checking_fun(row, col)
+		# group_imp_list = self.impossible_list(row,col)
+		# for ele in check_group:
+		# 	if(ele is not self.board[row][col] and not ele.is_set()):
+		# 		group_imp_list += ele.get_impossible_list()
+		# 		if (3 <= row < 6 and 0 <= col < 3):
+		# 			r, c = ele.get_row_col()
+		# 			print("ele: {}, row: {}, col: {}, iter row;col: [{},{}], imp_list: {}".format(ele, row, col, r, c, ele.get_impossible_list()))
+
+		# group_imp_list = list(set(group_imp_list))
+		# all_numbers = [str(x) for x in range(1,10)]
+		# all_minus_block = [x for x in all_numbers if x not in [repr(i) for i in check_group]]
+		# possible_list = [x for x in all_minus_block if x not in group_imp_list]
+		# if (3 <= row < 6 and 0 <= col < 3):
+		# 	print("g_imp", group_imp_list)
+		# # print(impossible_list)
+		# if (3 <= row < 6 and 0 <= col < 3):
+		# 	print("possible", sorted(possible_list))
+		# if(len(possible_list) == 1):
+		# 	self.board[row][col].set_possibility(possible_list[0], Square_Values.true)
+		check_group = checking_fun(row,col)
+		group_imp_list = []
+		for ele in check_group:
+			if(ele is not self.board[row][col] and not ele.is_set()):
+				group_imp_list.append(set(ele.get_impossible_list()))
+
+
+		inters_list = set.intersection(*group_imp_list)
+		for ele in check_group:
+			if(repr(ele) in inters_list):
+				inters_list.remove(repr(ele))
+		inters_list = list(inters_list)
+		if (3 <= row < 6 and 0 <= col < 3):
+			print(inters_list)
+		if(len(inters_list) == 1):
+			self.board[row][col].set_possibility(inters_list[0], Square_Values.true)
+
+	def is_equal(self, compare_with):
+		for row1, row2 in zip(self.board, compare_with):
+			for ele1, ele2 in zip(row1, row2):
+				if not ele1.is_equal(ele2):
+					return False
+		return True
