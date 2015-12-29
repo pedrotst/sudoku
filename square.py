@@ -19,7 +19,6 @@ class Square(object):
 						'8': Square_Values.maybe,
 						'9': Square_Values.maybe}
 
-
 	def __str__(self):
 		self.validate()
 		for x in self.square:
@@ -72,16 +71,15 @@ class Square(object):
 		return possible_list
 
 	def get_impossible_list(self):
-		
+
 		impossible_list = []
-		if not self.is_set():
-			for key in self.square:
-				if self.square[key] == Square_Values.false:
-					impossible_list.append(key)
+		for key in self.square:
+			if self.square[key] == Square_Values.false:
+				impossible_list.append(key)
 		return impossible_list
 
 	def is_equal(self, compare_with):
-		for x1, x2 in zip(self.square, compare_with.square):
-			if self.square[x1] !=  compare_with.square[x2]:
+		for key in self.square:
+			if self.square[key] !=  compare_with.square[key]:
 				return False
 		return True

@@ -5,6 +5,13 @@ class Board(object):
 	def __init__(self):
 		self.board = [[Square(row, col) for col in range(9)] for row in range(9)]
 
+	def __init__(self, matrix):
+		self.board = [[Square(row, col) for col in range(9)] for row in range(9)]
+		for row_num, row in enumerate(matrix):
+			for col_num, ele in enumerate(row):
+				if(ele in [str(x) for x in range(10)]):
+					self.board[row_num][col_num].set_possibility(ele, Square_Values.true)
+
 	def __str__(self):
 		string = ''
 		for row_num, row in enumerate(self.board):
@@ -108,40 +115,21 @@ class Board(object):
 			self.board[row][col].set_possibility(impossible_ele, Square_Values.false)
 	
 	def check_only_possible(self, checking_fun, row, col):
-		# check_group = checking_fun(row, col)
-		# group_imp_list = self.impossible_list(row,col)
-		# for ele in check_group:
-		# 	if(ele is not self.board[row][col] and not ele.is_set()):
-		# 		group_imp_list += ele.get_impossible_list()
-		# 		if (3 <= row < 6 and 0 <= col < 3):
-		# 			r, c = ele.get_row_col()
-		# 			print("ele: {}, row: {}, col: {}, iter row;col: [{},{}], imp_list: {}".format(ele, row, col, r, c, ele.get_impossible_list()))
-
-		# group_imp_list = list(set(group_imp_list))
-		# all_numbers = [str(x) for x in range(1,10)]
-		# all_minus_block = [x for x in all_numbers if x not in [repr(i) for i in check_group]]
-		# possible_list = [x for x in all_minus_block if x not in group_imp_list]
-		# if (3 <= row < 6 and 0 <= col < 3):
-		# 	print("g_imp", group_imp_list)
-		# # print(impossible_list)
-		# if (3 <= row < 6 and 0 <= col < 3):
-		# 	print("possible", sorted(possible_list))
-		# if(len(possible_list) == 1):
-		# 	self.board[row][col].set_possibility(possible_list[0], Square_Values.true)
 		check_group = checking_fun(row,col)
 		group_imp_list = []
 		for ele in check_group:
-			if(ele is not self.board[row][col] and not ele.is_set()):
+			if(ele is not self.board[row][col]):
 				group_imp_list.append(set(ele.get_impossible_list()))
-
-
+				if(row == 3 and col == 2):
+					print("Ele: {}, Row: {}, Col: {}, imp_list: {}:".format(ele, ele.row, ele.col, sorted(ele.get_impossible_list())))
+		# print(row, col, group_imp_list, check_group)
 		inters_list = set.intersection(*group_imp_list)
+		
 		for ele in check_group:
 			if(repr(ele) in inters_list):
 				inters_list.remove(repr(ele))
 		inters_list = list(inters_list)
-		if (3 <= row < 6 and 0 <= col < 3):
-			print(inters_list)
+		# if (3 <= row < 6 and 0 <= col < 3):
 		if(len(inters_list) == 1):
 			self.board[row][col].set_possibility(inters_list[0], Square_Values.true)
 
