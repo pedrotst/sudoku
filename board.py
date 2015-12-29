@@ -121,7 +121,8 @@ class Board(object):
 			if(ele is not self.board[row][col]):
 				group_imp_list.append(set(ele.get_impossible_list()))
 				if(row == 3 and col == 2):
-					print("Ele: {}, Row: {}, Col: {}, imp_list: {}:".format(ele, ele.row, ele.col, sorted(ele.get_impossible_list())))
+					pass
+					#print("Ele: {}, Row: {}, Col: {}, imp_list: {}:".format(ele, ele.row, ele.col, sorted(ele.get_impossible_list())))
 		# print(row, col, group_imp_list, check_group)
 		inters_list = set.intersection(*group_imp_list)
 		
@@ -131,7 +132,30 @@ class Board(object):
 		inters_list = list(inters_list)
 		# if (3 <= row < 6 and 0 <= col < 3):
 		if(len(inters_list) == 1):
-			self.board[row][col].set_possibility(inters_list[0], Square_Values.true)
+			if(inters_list[0] not in self.impossible_list(row, col)):
+				self.board[row][col].set_possibility(inters_list[0], Square_Values.true)
+
+	def validate_board(self):
+
+		for row_num, row in enumerate(self.board):
+			for col_num, ele in enumerate(row):
+				row_list = self.get_row(row_num, 0)
+				#row_list = self.delete_spaces(row_list)
+				col_list = self.get_col(0, col_num)
+				#col_list = self.delete_spaces(col_list)
+				block_list = self.get_block(row_num,col_num)
+				#block_list = self.delete_spaces(block_list)
+				print(row_list, col_list, block_list)
+				if(self.has_repeated(row_list) or self.has_repeated(col_list) or self.has_repeated(block_list)):
+					print(self.board)
+					raise AttributeError("Elemento na row {} col {} está repetido".format(row_num, col_num))
+
+	def has_repeated(self, _list):
+		_list = [repr(x) for x in _list if repr(x) != '_']
+		for x in _list:
+			if(_list.count(x) > 1):
+				return True
+		return False
 
 	def is_equal(self, compare_with):
 		for row1, row2 in zip(self.board, compare_with):

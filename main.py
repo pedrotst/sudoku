@@ -3,16 +3,26 @@ import copy
 
 
 if __name__ == '__main__':
+	#board = Board([
+	#	['9', ' ', '6', ' ', '1', '3', ' ', ' ', '8'],
+	#	[' ', '5', '8', ' ', ' ', ' ', ' ', '9', ' '],
+	#	[' ', '3', ' ', ' ', ' ', ' ', ' ', '1', ' '],
+	#	[' ', '6', ' ', '8', ' ', ' ', '9', '2', ' '],
+	#	[' ', ' ', '3', '4', ' ', '9', '1', ' ', ' '],
+	#	[' ', '4', '9', ' ', ' ', '6', ' ', '3', ' '],
+	#	[' ', '9', ' ', ' ', ' ', ' ', ' ', '8', ' '],
+	#	[' ', '1', ' ', ' ', ' ', ' ', '6', '7', ' '],
+	#	['4', ' ', ' ', '9', '6', ' ', '3', ' ', '1']])	
 	board = Board([
-		['9', ' ', '6', ' ', '1', '3', ' ', ' ', '8'],
-		[' ', '5', '8', ' ', ' ', ' ', ' ', '9', ' '],
-		[' ', '3', ' ', ' ', ' ', ' ', ' ', '1', ' '],
-		[' ', '6', ' ', '8', ' ', ' ', '9', '2', ' '],
-		[' ', ' ', '3', '4', ' ', '9', '1', ' ', ' '],
-		[' ', '4', '9', ' ', ' ', '6', ' ', '3', ' '],
-		[' ', '9', ' ', ' ', ' ', ' ', ' ', '8', ' '],
-		[' ', '1', ' ', ' ', ' ', ' ', '6', '7', ' '],
-		['4', ' ', ' ', '9', '6', ' ', '3', ' ', '1']])
+		['8 ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+		[' ', ' ', '3', '6', ' ', ' ', ' ', ' ', ' '],
+		[' ', '7', ' ', ' ', '9', ' ', '2', ' ', ' '],
+		[' ', '5', ' ', ' ', ' ', '7', ' ', ' ', ' '],
+		[' ', ' ', ' ', ' ', '4', '5', '7', ' ', ' '],
+		[' ', ' ', ' ', '1', ' ', ' ', ' ', '3', ' '],
+		[' ', ' ', '1', ' ', ' ', ' ', ' ', '6', '8'],
+		[' ', ' ', '8', '5', ' ', ' ', ' ', '1', ' '],
+		[' ', '9', ' ', '9', '6', ' ', '4', ' ', ' ']])
 	# board.set_element('2', 0, 1)
 	# board.set_element('5', 1, 1)
 	# board.set_element('4', 2, 1)
@@ -85,13 +95,14 @@ if __name__ == '__main__':
 
 	
 	old_board = Board([[]*9])
-	while(not board.is_equal(old_board.get_board())):	
+	while(not board.is_equal(old_board.get_board())):
 		old_board = copy.deepcopy(board)
-		print(old_board)
+
 		for row_num, row in enumerate(board.get_board()):
 			for col_num, ele in enumerate(row):
 				if(not ele.is_set()):
 					board.validate_element(row_num, col_num)
+		
 		for row_num, row in enumerate(board.get_board()):
 			for col_num, ele in enumerate(row):
 				if(not ele.is_set()):
@@ -121,7 +132,7 @@ if __name__ == '__main__':
 				if(not ele.is_set()):
 					board.check_only_possible(board.get_row, row_num, col_num)
 				# print(.get_possible_list())
-
+		board.validate_board()
 		print(old_board, board)
 
 	# board.check_only_possible(board.get_block, 3, 0)	
