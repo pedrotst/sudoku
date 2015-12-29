@@ -9,7 +9,7 @@ class Board(object):
 		self.board = [[Square(row, col) for col in range(9)] for row in range(9)]
 		for row_num, row in enumerate(matrix):
 			for col_num, ele in enumerate(row):
-				if(ele in [str(x) for x in range(10)]):
+				if(ele in [str(x) for x in range(1,10)]):
 					self.board[row_num][col_num].set_possibility(ele, Square_Values.true)
 
 	def __str__(self):
@@ -145,9 +145,9 @@ class Board(object):
 				#col_list = self.delete_spaces(col_list)
 				block_list = self.get_block(row_num,col_num)
 				#block_list = self.delete_spaces(block_list)
-				print(row_list, col_list, block_list)
+				#print(row_list, col_list, block_list)
 				if(self.has_repeated(row_list) or self.has_repeated(col_list) or self.has_repeated(block_list)):
-					print(self.board)
+					print(self)
 					raise AttributeError("Elemento na row {} col {} está repetido".format(row_num, col_num))
 
 	def has_repeated(self, _list):
