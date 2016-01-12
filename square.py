@@ -78,7 +78,7 @@ class Square(object):
 				impossible_list.append(key)
 		return impossible_list
 
-	def is_equal(self, compare_with):
+	def __eq__(self, compare_with):
 		for key in self.square:
 			if self.square[key] !=  compare_with.square[key]:
 				return False

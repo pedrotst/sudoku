@@ -3,14 +3,14 @@ import copy
 
 
 if __name__ == '__main__':
-	board = exemplos.induction_ex
+	board = exemplos.ex_board
 	print(board)
 
 	board.validate_board()
 	
 	
 	old_board = exemplos.blank_board
-	while(not board.is_equal(old_board.get_board())):
+	while(board != old_board):
 		old_board = copy.deepcopy(board)
 
 		for row_num, row in enumerate(board.get_board()):

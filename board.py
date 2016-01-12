@@ -100,12 +100,27 @@ class Board(object):
 	def delete_spaces(self, _list):
 		return [x for x in _list if repr(x) != '_']
 
+	def list_inversion(self, _list):
+		complete_list = range(1, 10)
+		return [x for x in complete_list if x not in _list] 
+
+	def get_only_possible_row(self, block, row):
+		block_list = self.get_block(block)
+		row_block_list = [x for x in block_list if row == x.get_row_col()[0]]
+		for ele in block_list:
+			if ele not in (row_block_list):
+				group_imp_list.
+
+
 	def impossible_list(self, row, col):
 		row_list = self.get_row(row, 0)
 		col_list = self.get_col(0, col)
 		block_list = self.get_block(row,col)
 		impossible_list = self.delete_spaces(row_list) + self.delete_spaces(col_list) + self.delete_spaces(block_list)
 		impossible_list = [x for x in self.board[row][col].get_possible_list() if x in [repr(i) for i in impossible_list]]
+		#this bit of code will find elements in the row which must be in another block
+		block = self.calc_block(row, col)
+		impossible_list += self.get_only_possible_row(block-1, row), self.get_only_possible_row(block+1, row)
 		return impossible_list
 
 	def validate_element(self, row, col):
@@ -120,17 +135,13 @@ class Board(object):
 		for ele in check_group:
 			if(ele is not self.board[row][col]):
 				group_imp_list.append(set(ele.get_impossible_list()))
-				if(row == 3 and col == 2):
-					pass
-					#print("Ele: {}, Row: {}, Col: {}, imp_list: {}:".format(ele, ele.row, ele.col, sorted(ele.get_impossible_list())))
-		# print(row, col, group_imp_list, check_group)
 		inters_list = set.intersection(*group_imp_list)
 		
 		for ele in check_group:
 			if(repr(ele) in inters_list):
 				inters_list.remove(repr(ele))
+				
 		inters_list = list(inters_list)
-		# if (3 <= row < 6 and 0 <= col < 3):
 		if(len(inters_list) == 1):
 			if(inters_list[0] not in self.impossible_list(row, col)):
 				self.board[row][col].set_possibility(inters_list[0], Square_Values.true)
@@ -157,9 +168,9 @@ class Board(object):
 				return True
 		return False
 
-	def is_equal(self, compare_with):
-		for row1, row2 in zip(self.board, compare_with):
+	def __eq__(self, other):
+		for row1, row2 in zip(self.board, other.board):
 			for ele1, ele2 in zip(row1, row2):
-				if not ele1.is_equal(ele2):
+				if not ele1 == ele2:
 					return False
 		return True
