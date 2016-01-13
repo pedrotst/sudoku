@@ -36,13 +36,17 @@ class Board(object):
 		self.board[row][col].set_possibility(elem, Square_Values.true)
 
 	def get_row(self, row, col):
+		'''I'll leave row and col so these functions can be used as checking_fun in
+		self.check_only_possible'''
 		return self.board[row]
 
 	def get_col(self, row, col):
+		'''Idem'''
 		return [x[col] for x in self.board]
 
-	def get_block(self, row, col):
-		block = self.calc_block(row, col)
+	def get_block(self, row, col, block = None):
+		if block is None:
+			block = self.calc_block(row, col)
 		block_list = []
 		if(block == 0):
 			for not_merged in [x[:3] for x in self.board[:3]]:
@@ -105,12 +109,43 @@ class Board(object):
 		return [x for x in complete_list if x not in _list] 
 
 	def get_only_possible_row(self, block, row):
-		block_list = self.get_block(block)
-		row_block_list = [x for x in block_list if row == x.get_row_col()[0]]
+		block_list = self.get_block(0, 0, block)
+		row_block_list = [x for x in block_list if row == x.get_row()]
+		group_imp_list = []
 		for ele in block_list:
-			if ele not in (row_block_list):
-				group_imp_list.
+			if block == 2:
+				print(ele.get_row_col())
+			for i in row_block_list:
+				if i.get_row_col() == ele.get_row_col():
+					isnot_row = False
+				else:
+					isnot_row = True
+			if isnot_row:
+				group_imp_list.append(set(ele.get_impossible_list()))
+		if len(group_imp_list) != 0:
+			inters_set = set.intersection(*group_imp_list)
+		else:
+			return []
+		row_block_poss_list = []
+		for ele in row_block_list:
+			if not ele.is_set():
+				row_block_poss_list.append(set(ele.get_possible_list()))
+			
+		if len(row_block_poss_list) != 0:
+			inters_set2 = set.intersection(*row_block_poss_list)
+		else:
+			return []
 
+		return list(set.intersection(inters_set2, inters_set))
+		
+
+	def calc_adjacency(self, block):
+		if block % 3 == 0:
+			return 1, 2
+		elif block % 3 == 1:
+			return -1, 1
+		else:
+			return -1, -2
 
 	def impossible_list(self, row, col):
 		row_list = self.get_row(row, 0)
@@ -120,12 +155,15 @@ class Board(object):
 		impossible_list = [x for x in self.board[row][col].get_possible_list() if x in [repr(i) for i in impossible_list]]
 		#this bit of code will find elements in the row which must be in another block
 		block = self.calc_block(row, col)
-		impossible_list += self.get_only_possible_row(block-1, row), self.get_only_possible_row(block+1, row)
+		n1, n2 = self.calc_adjacency(block)
+		added_list1, added_list2 = self.get_only_possible_row(block+n1, row) , self.get_only_possible_row(block+n2, row)
+		#print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
+		impossible_list += added_list1 + added_list2
 		return impossible_list
 
 	def validate_element(self, row, col):
 		impossible_list = self.impossible_list(row,col)
-		# print("row: {}, col: {}, imp_list: {}".format(row, col, impossible_list))
+		#print("row: {}, col: {}, imp_list: {}".format(row, col, impossible_list))
 		for impossible_ele in impossible_list:
 			self.board[row][col].set_possibility(impossible_ele, Square_Values.false)
 	

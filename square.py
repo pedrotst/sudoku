@@ -31,6 +31,12 @@ class Square(object):
 
 	def get_row_col(self):
 		return self.row, self.col
+	
+	def get_row(self):
+		return self.row
+
+	def get_col(self):
+		return self.col
 
 	def validate(self):
 		true_count = 0
@@ -83,3 +89,6 @@ class Square(object):
 			if self.square[key] !=  compare_with.square[key]:
 				return False
 		return True
+	
+	#def __contains__(self, item):
+		#return True if item.get_row_col() == self.get_row_col() else False
