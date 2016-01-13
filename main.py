@@ -3,7 +3,7 @@ import copy
 
 
 if __name__ == '__main__':
-	board = exemplos.ex_board
+	board = exemplos.induction_ex
 	print(board)
 
 	board.validate_board()

@@ -113,14 +113,13 @@ class Board(object):
 		row_block_list = [x for x in block_list if row == x.get_row()]
 		group_imp_list = []
 		for ele in block_list:
-			if block == 2:
-				print(ele.get_row_col())
-			for i in row_block_list:
-				if i.get_row_col() == ele.get_row_col():
-					isnot_row = False
-				else:
-					isnot_row = True
-			if isnot_row:
+		#	for i in row_block_list:
+		#		if i.get_row_col() == ele.get_row_col():
+			#		isnot_row = False
+			#	else:
+			#		isnot_row = True
+			#if isnot_row:
+			if ele not in row_block_list:
 				group_imp_list.append(set(ele.get_impossible_list()))
 		if len(group_imp_list) != 0:
 			inters_set = set.intersection(*group_imp_list)
@@ -157,7 +156,8 @@ class Board(object):
 		block = self.calc_block(row, col)
 		n1, n2 = self.calc_adjacency(block)
 		added_list1, added_list2 = self.get_only_possible_row(block+n1, row) , self.get_only_possible_row(block+n2, row)
-		#print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
+		if row == 6 and col == 5:
+			print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
 		impossible_list += added_list1 + added_list2
 		return impossible_list
 

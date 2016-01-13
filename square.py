@@ -86,7 +86,7 @@ class Square(object):
 
 	def __eq__(self, compare_with):
 		for key in self.square:
-			if self.square[key] !=  compare_with.square[key]:
+			if self.square[key] !=  compare_with.square[key] or self.get_row_col() != compare_with.get_row_col():
 				return False
 		return True
 	
