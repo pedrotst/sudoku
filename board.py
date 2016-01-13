@@ -108,9 +108,15 @@ class Board(object):
 		complete_list = range(1, 10)
 		return [x for x in complete_list if x not in _list] 
 
-	def get_only_possible_row(self, block, row):
+	def get_ele_row(self, x):
+		return x.get_row()
+
+	def get_ele_col(self, x):
+		return x.get_col()
+
+	def get_only_possible(self, block, row_or_col, get_meth):
 		block_list = self.get_block(0, 0, block)
-		row_block_list = [x for x in block_list if row == x.get_row()]
+		row_block_list = [x for x in block_list if row_or_col == get_meth(x)]
 		group_imp_list = []
 		for ele in block_list:
 		#	for i in row_block_list:
@@ -146,6 +152,14 @@ class Board(object):
 		else:
 			return -1, -2
 
+	def calc_below_above(self, block):
+		if block < 3:
+			return 3, 6
+		elif 3 <= block < 6:
+			return -3, 3
+		else:
+			return -3, -6
+
 	def impossible_list(self, row, col):
 		row_list = self.get_row(row, 0)
 		col_list = self.get_col(0, col)
@@ -155,10 +169,12 @@ class Board(object):
 		#this bit of code will find elements in the row which must be in another block
 		block = self.calc_block(row, col)
 		n1, n2 = self.calc_adjacency(block)
-		added_list1, added_list2 = self.get_only_possible_row(block+n1, row) , self.get_only_possible_row(block+n2, row)
-		if row == 6 and col == 5:
-			print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
-		impossible_list += added_list1 + added_list2
+		added_list1, added_list2 = self.get_only_possible(block+n1, row, lambda x: x.get_row()) , self.get_only_possible(block+n2, row, lambda x: x.get_row())
+		#if row == 6 and col == 5:
+		#	print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
+		n3, n4 = self.calc_below_above(block)
+		added_list3, added_list4 = self.get_only_possible(block+n3, col, lambda x: x.get_col()), self.get_only_possible(block+n4, col, lambda x: x.get_col())
+		impossible_list += added_list3 + added_list4
 		return impossible_list
 
 	def validate_element(self, row, col):
