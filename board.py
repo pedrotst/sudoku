@@ -29,6 +29,13 @@ class Board(object):
 	def __repr__(self):
 		return self.__str__()
 
+	def __eq__(self, other):
+		for row1, row2 in zip(self.board, other.board):
+			for ele1, ele2 in zip(row1, row2):
+				if ele1 != ele2:
+					return False
+		return True
+
 	def get_board(self):
 		return self.board
 
@@ -101,49 +108,6 @@ class Board(object):
 			elif 6 <= col < 9:
 				return 8
 
-	def delete_spaces(self, _list):
-		return [x for x in _list if repr(x) != '_']
-
-	def list_inversion(self, _list):
-		complete_list = range(1, 10)
-		return [x for x in complete_list if x not in _list] 
-
-	def get_ele_row(self, x):
-		return x.get_row()
-
-	def get_ele_col(self, x):
-		return x.get_col()
-
-	def get_only_possible(self, block, row_or_col, get_meth):
-		block_list = self.get_block(0, 0, block)
-		row_block_list = [x for x in block_list if row_or_col == get_meth(x)]
-		group_imp_list = []
-		for ele in block_list:
-		#	for i in row_block_list:
-		#		if i.get_row_col() == ele.get_row_col():
-			#		isnot_row = False
-			#	else:
-			#		isnot_row = True
-			#if isnot_row:
-			if ele not in row_block_list:
-				group_imp_list.append(set(ele.get_impossible_list()))
-		if len(group_imp_list) != 0:
-			inters_set = set.intersection(*group_imp_list)
-		else:
-			return []
-		row_block_poss_list = []
-		for ele in row_block_list:
-			if not ele.is_set():
-				row_block_poss_list.append(set(ele.get_possible_list()))
-			
-		if len(row_block_poss_list) != 0:
-			inters_set2 = set.intersection(*row_block_poss_list)
-		else:
-			return []
-
-		return list(set.intersection(inters_set2, inters_set))
-		
-
 	def calc_adjacency(self, block):
 		if block % 3 == 0:
 			return 1, 2
@@ -160,26 +124,59 @@ class Board(object):
 		else:
 			return -3, -6
 
+	def delete_spaces(self, _list):
+		return [x for x in _list if repr(x) != '_']
+
+	def get_only_possible(self, block, row_or_col, get_method):
+		block_list = self.get_block(0, 0, block)
+		row_block_list = [x for x in block_list if row_or_col == get_method(x)]
+		group_imp_list = []
+		for ele in block_list:
+			if ele not in row_block_list:
+				group_imp_list.append(set(ele.get_impossible_list()))
+
+		if len(group_imp_list) != 0:
+			inters_set = set.intersection(*group_imp_list)
+		else:
+			return []
+
+		row_block_poss_list = []
+		for ele in row_block_list:
+			if not ele.is_set():
+				row_block_poss_list.append(set(ele.get_possible_list()))
+			
+		if len(row_block_poss_list) != 0:
+			inters_set2 = set.intersection(*row_block_poss_list)
+		else:
+			return []
+
+		return list(set.intersection(inters_set2, inters_set))
+		
+
 	def impossible_list(self, row, col):
 		row_list = self.get_row(row, 0)
 		col_list = self.get_col(0, col)
 		block_list = self.get_block(row,col)
 		impossible_list = self.delete_spaces(row_list) + self.delete_spaces(col_list) + self.delete_spaces(block_list)
 		impossible_list = [x for x in self.board[row][col].get_possible_list() if x in [repr(i) for i in impossible_list]]
+
 		#this bit of code will find elements in the row which must be in another block
 		block = self.calc_block(row, col)
 		n1, n2 = self.calc_adjacency(block)
-		added_list1, added_list2 = self.get_only_possible(block+n1, row, lambda x: x.get_row()) , self.get_only_possible(block+n2, row, lambda x: x.get_row())
-		#if row == 6 and col == 5:
-		#	print("Added List1: {}, Added list 2: {} Row: {}, Col: {}, Block: {}, N1: {}, N2: {}".format(added_list1, added_list2, row, col, block, n1, n2))
+		imp_block1 = self.get_only_possible(block+n1, row, lambda x: x.get_row()) 
+		imp_block2 = self.get_only_possible(block+n2, row, lambda x: x.get_row())
+
+		#and this bit will find elements in the collumn which must be in another block
 		n3, n4 = self.calc_below_above(block)
-		added_list3, added_list4 = self.get_only_possible(block+n3, col, lambda x: x.get_col()), self.get_only_possible(block+n4, col, lambda x: x.get_col())
-		impossible_list += added_list3 + added_list4
+		imp_block3 = self.get_only_possible(block+n3, col, lambda x: x.get_col())
+		imp_block4 = self.get_only_possible(block+n4, col, lambda x: x.get_col())
+
+		impossible_list += imp_block1 + imp_block2 + imp_block3 + imp_block4
+		
 		return impossible_list
 
 	def validate_element(self, row, col):
 		impossible_list = self.impossible_list(row,col)
-		#print("row: {}, col: {}, imp_list: {}".format(row, col, impossible_list))
 		for impossible_ele in impossible_list:
 			self.board[row][col].set_possibility(impossible_ele, Square_Values.false)
 	
@@ -205,12 +202,8 @@ class Board(object):
 		for row_num, row in enumerate(self.board):
 			for col_num, ele in enumerate(row):
 				row_list = self.get_row(row_num, 0)
-				#row_list = self.delete_spaces(row_list)
 				col_list = self.get_col(0, col_num)
-				#col_list = self.delete_spaces(col_list)
 				block_list = self.get_block(row_num,col_num)
-				#block_list = self.delete_spaces(block_list)
-				#print(row_list, col_list, block_list)
 				if(self.has_repeated(row_list) or self.has_repeated(col_list) or self.has_repeated(block_list)):
 					print(self)
 					raise AttributeError("Elemento na row {} col {} está repetido".format(row_num, col_num))
@@ -222,9 +215,4 @@ class Board(object):
 				return True
 		return False
 
-	def __eq__(self, other):
-		for row1, row2 in zip(self.board, other.board):
-			for ele1, ele2 in zip(row1, row2):
-				if not ele1 == ele2:
-					return False
-		return True
+
